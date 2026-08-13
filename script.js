@@ -83,15 +83,23 @@ const LOGO_DATA = "assets/images/logo_data.png";
     document.getElementById('qtyVal').textContent = currentQty;
     
     // Check if sold out
-    const addBtn = document.getElementById('addBtn');
+    const addCartBtn = document.getElementById('addCartBtn');
+    const buyNowBtn = document.getElementById('buyNowBtn');
+    
     if(currentProduct.sold_out) {
-      addBtn.textContent = "ÉPUISÉ";
-      addBtn.style.opacity = "0.5";
-      addBtn.style.pointerEvents = "none";
+      addCartBtn.textContent = "ÉPUISÉ";
+      addCartBtn.style.opacity = "0.5";
+      addCartBtn.style.pointerEvents = "none";
+      
+      buyNowBtn.style.opacity = "0.5";
+      buyNowBtn.style.pointerEvents = "none";
     } else {
-      addBtn.textContent = "AJOUTER";
-      addBtn.style.opacity = "1";
-      addBtn.style.pointerEvents = "auto";
+      addCartBtn.textContent = "Ajouter";
+      addCartBtn.style.opacity = "1";
+      addCartBtn.style.pointerEvents = "auto";
+      
+      buyNowBtn.style.opacity = "1";
+      buyNowBtn.style.pointerEvents = "auto";
     }
 
     storeView.style.display = 'none';
@@ -332,4 +340,3 @@ const LOGO_DATA = "assets/images/logo_data.png";
   }
 
   loadData();
-});
