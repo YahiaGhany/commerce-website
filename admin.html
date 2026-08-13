@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Casqueta Halawa</title>
+  <link rel="stylesheet" href="style.css?v=3">
+  <style>
+    /* Styles spécifiques à l'Admin, utilisant les variables de style.css */
+    body { background: var(--bg-dim); padding: 40px 20px; font-family: 'Space Grotesk', sans-serif; }
+    .admin-container { max-width: 1000px; margin: 0 auto; background: var(--bg-color); padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 30px; }
+    .admin-header h1 { font-family: 'Anton'; font-size: 32px; letter-spacing: 0.02em; color: var(--ink); margin: 0; }
+    
+    .section-title { font-family: 'Anton'; font-size: 24px; color: var(--ink); margin-bottom: 20px; text-transform: uppercase; }
+    .admin-box { background: var(--bg-dim); padding: 20px; border-radius: 8px; margin-bottom: 40px; }
+    
+    /* Forms */
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--ink); font-size: 14px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+    .form-group textarea { height: 80px; resize: vertical; }
+    .btn { background: var(--ink); color: var(--bg-color); border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; border-radius: 4px; font-family: 'Space Mono'; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.8; }
+    .btn-red { background: var(--red); }
+    .btn-small { padding: 5px 10px; font-size: 12px; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; background: var(--bg-color); }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+    th { background: var(--ink); color: var(--bg-color); font-family: 'Space Mono'; font-size: 14px; }
+    td { font-size: 14px; vertical-align: middle; }
+    .prod-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; background: var(--bg-dim); }
+    
+    .status-badge { display: inline-block; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 12px; font-family: 'Space Mono'; }
+    .status-ok { background: #E8F5E9; color: #2E7D32; }
+    .status-out { background: #FFEBEE; color: #C62828; }
+    
+    .actions { display: flex; gap: 8px; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; }
+    .modal-content { background: var(--bg-color); padding: 30px; border-radius: 8px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-overlay.active { display: flex; }
+    .close-modal { float: right; cursor: pointer; font-size: 24px; font-weight: bold; color: var(--ink); }
+
+    .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center; z-index: 200; font-family: 'Anton'; font-size: 24px; }
+    .loading-overlay.active { display: flex; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>Administration HALAWA</h1>
+      <a href="index-13.html" class="btn" style="text-decoration:none; background:var(--teal);">Voir le site</a>
+    </div>
+
+    <!-- Promotions Section -->
+    <div class="admin-box">
+      <h2 class="section-title">Promotions & Bandeau</h2>
+      <div class="form-group">
+        <label>Texte du bandeau défilant</label>
+        <input type="text" id="promoText" placeholder="Texte affiché en haut du site">
+      </div>
+      <div style="display:flex; gap:20px;">
+        <div class="form-group" style="flex:1;">
+          <label>Réduction 2 casquettes (en DH)</label>
+          <input type="number" id="promo2" placeholder="Ex: -50">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>3 achetées = 1 offerte ?</label>
+          <select id="promo3" style="width:100%; padding:10px;">
+            <option value="true">Oui (Activé)</option>
+            <option value="false">Non (Désactivé)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="savePromoBtn">Enregistrer les promotions</button>
+    </div>
+
+    <!-- Products Section -->
+    <div class="admin-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h2 class="section-title" style="margin:0;">Produits</h2>
+        <button class="btn" id="openAddModalBtn">Ajouter un produit</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Nom</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="productsTableBody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add/Edit Product Modal -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModalBtn">&times;</span>
+      <h2 class="section-title" id="modalTitle">Ajouter un produit</h2>
+      
+      <input type="hidden" id="prodId">
+      <input type="hidden" id="prodImgUrl">
+      
+      <div class="form-group">
+        <label>Nom du produit</label>
+        <input type="text" id="prodName" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Prix (DH)</label>
+        <input type="number" id="prodPrice" value="199" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="prodDesc" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Image (Upload Cloudinary)</label>
+        <input type="file" id="prodImage" accept="image/*">
+        <small id="imgHelpText">Laissez vide si vous ne voulez pas modifier l'image actuelle.</small>
+      </div>
+
+      <button class="btn" id="saveProductBtn" style="width:100%;">Enregistrer le produit</button>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">Traitement en cours...</div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Admin Script -->
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -8,11 +8,13 @@ const LOGO_DATA = "assets/images/logo_data.png";
   // CONFIGURATION FIREBASE (À REMPLIR PAR LE CLIENT)
   // ==========================================
   const firebaseConfig = {
-    // ⚠️ COLLE TON CONFIG FIREBASE ICI ⚠️
-    // apiKey: "...",
-    // authDomain: "...",
-    // projectId: "...",
-    // ...
+    apiKey: "AIzaSyDCmvE_z8N1TFGvLMDYtfIUIzAcqKyIfY0",
+    authDomain: "halawa-6f539.firebaseapp.com",
+    projectId: "halawa-6f539",
+    storageBucket: "halawa-6f539.firebasestorage.app",
+    messagingSenderId: "605940071834",
+    appId: "1:605940071834:web:217fc554f43b3294ebce23",
+    measurementId: "G-BY23NJ6JSX"
   };
 
   // Initialisation (S'exécute uniquement si la config est présente)
