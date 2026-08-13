@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casqueta Halawa — Casablanca Street Fashion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2">
+
+<!-- Streetwear SVG symbols -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <symbol id="crown" viewBox="0 0 24 18">
+    <path d="M2 16L4 6l4 4 4-8 4 8 4-4 2 10H2z" fill="currentColor"/>
+    <rect x="1" y="15" width="22" height="3" rx="1" fill="currentColor"/>
+  </symbol>
+</svg>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brandmark" data-nav="top">
+      <img id="logoHeader" class="logo-header-img" alt="Casqueta Halawa">
+    </div>
+    <nav class="links">
+      <a data-nav="collection">Boutique</a>
+      <a data-nav="promo-info">Promo</a>
+      <a data-nav="about">L'histoire</a>
+      <a data-nav="contact">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <button class="cart-btn" id="cartOpenBtn">Panier <span class="cart-count" id="cartCount">0</span></button>
+      <a class="nav-cta" data-nav="collection">COMMANDER</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ STORE VIEW ============ -->
+<div id="storeView">
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow"><svg class="crown-icon" width="12" height="12"><use href="#crown"/></svg> Casablanca Edition</div>
+        <h1>DES CASQUETTES<br>QUI SONT<br><span class="l2">HALAWA</span></h1>
+        <div class="hero-ctas">
+          <a class="btn btn-solid" data-nav="collection">Voir la collection</a>
+          <a class="btn btn-outline" data-nav="promo-info">Promotions</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <img src="assets/images/Logo.JPG" class="hero-cap-icon" alt="Casqueta Halawa Logo">
+        <div class="hero-tag">199 DH</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="promo" id="promo-info">
+    <div class="promo-track">
+      <span>2 CASQUETTES ACHETÉES = -50 DH</span> · <span>3 ACHETÉES, LA 4ÈME OFFERTE</span> · 199 DH L'UNITÉ · LIVRAISON PARTOUT AU MAROC ·
+      <span>2 CASQUETTES ACHETÉES = -50 DH</span> · <span>3 ACHETÉES, LA 4ÈME OFFERTE</span> · 199 DH L'UNITÉ · LIVRAISON PARTOUT AU MAROC ·
+    </div>
+  </div>
+
+  <section class="wall" id="collection">
+    <div class="wrap section">
+      <div class="section-head reveal">
+        <div class="eyebrow">Le mur</div>
+        <h2>La Collection</h2>
+        <p>Sélection de casquettes haut de gamme, ajustées et brodées.</p>
+      </div>
+      <div class="wall-grid" id="wallGrid"></div>
+    </div>
+  </section>
+
+
+  <section class="wrap section">
+    <div class="section-head reveal">
+      <div class="eyebrow">Processus</div>
+      <h2>Commander en 3 étapes</h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>Le Choix</h3>
+        <p>Parcours le mur des casquettes, ouvre la fiche produit et ajoute ton modèle au panier.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Les Infos</h3>
+        <p>Renseigne ton nom complet, adresse, ville et numéro — pour une livraison directe.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>L'Essai</h3>
+        <p>Paiement en espèces à la livraison. Tu essaies, si ça ne te plaît pas, tu ne paies que la livraison.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="contact">
+    <div class="contact reveal">
+      <div>
+        <div class="eyebrow">Support</div>
+        <h2>Contact</h2>
+        <p>Besoin d'aide ou d'une info sur la livraison ? On est disponible en message direct.</p>
+      </div>
+      <div class="contact-links">
+        <a class="clink" href="#" id="waLink">
+          <span>WhatsApp<small>Commander directement</small></span>
+          <span class="arrow">→</span>
+        </a>
+        <a class="clink" href="#" id="igLink">
+          <span>Instagram<small>@casquetahalawa</small></span>
+          <span class="arrow">→</span>
+        </a>
+        <a class="clink" href="mailto:casquetahalawa@gmail.com">
+          <span>Email<small>casquetahalawa@gmail.com</small></span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ PRODUCT VIEW ============ -->
+<div id="productView">
+  <div class="wrap" style="padding:50px 28px 90px;">
+    <button class="backbtn" id="backToStore">← Retour</button>
+    <div class="product-grid">
+      <div class="product-visual" id="pVisual"></div>
+      <div>
+        <div class="p-name" id="pName"></div>
+        <div class="p-price" id="pPrice"></div>
+        <p class="p-desc" id="pDesc"></p>
+        <div class="p-promo-note">🎁 Promo : 2 achetées = -50 DH | 3 achetées = 4ème offerte</div>
+        <div class="qty-row">
+          <span class="mono" style="font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-light);">Quantité</span>
+          <div class="qty-stepper">
+            <button id="qtyMinus">−</button><span id="qtyVal">1</span><button id="qtyPlus">+</button>
+          </div>
+        </div>
+        <div class="p-actions">
+          <button class="btn btn-outline" id="addCartBtn">Ajouter</button>
+          <button class="btn btn-solid" id="buyNowBtn">Commander</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="foot-brand"><img id="logoFooter" class="logo-header-img" alt="Casqueta Halawa" style="height:64px;"></div>
+    <div class="foot-note">© 2026 Casqueta Halawa — Street Fashion</div>
+  </div>
+</footer>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="overlay-bg" id="overlayBg"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h3>Panier</h3>
+    <button class="drawer-close" id="drawerClose">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot" style="display:none;">
+    <div class="sum-row"><span>Articles</span><span id="sumQty">0</span></div>
+    <div class="sum-row discount" id="sumFreeRow" style="display:none;"><span>Offerte(s) (3+1)</span><span id="sumFree">0</span></div>
+    <div class="sum-row discount" id="sumDiscountRow" style="display:none;"><span>Réduction (2+)</span><span id="sumDiscount">0</span></div>
+    <div class="sum-row total"><span>Total</span><span id="sumTotal">0 DH</span></div>
+    <button class="btn btn-solid" style="width:100%; justify-content:center; margin-top:14px;" id="goCheckoutBtn">Commander</button>
+  </div>
+</div>
+
+<!-- ============ CHECKOUT MODAL ============ -->
+<div class="modal" id="checkoutModal">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="checkoutForm">
+      <h3>Livraison</h3>
+      <div class="modal-sub">Paiement à la livraison</div>
+      <div class="modal-summary" id="modalSummary"></div>
+      <div class="field"><label>Nom complet</label><input type="text" id="custName" placeholder="Ton nom et prénom"></div>
+      <div class="field-row">
+        <div class="field"><label>Ville</label><input type="text" id="custCity" placeholder="Casablanca..."></div>
+        <div class="field"><label>Téléphone</label><input type="tel" id="custPhone" placeholder="06 XX XX XX XX"></div>
+      </div>
+      <div class="field"><label>Adresse complète</label><input type="text" id="custAddress" placeholder="Rue, numéro, quartier..."></div>
+      <div class="policy-box"><b>Paiement à la livraison.</b> Essaie ta casquette à la réception : si elle ne te plaît pas, tu ne paies que la livraison.</div>
+      <button class="btn btn-solid" style="width:100%; justify-content:center;" id="submitOrderBtn">Confirmer via WhatsApp</button>
+    </div>
+    <div class="confirm-view" id="confirmView" style="display:none;">
+      <div style="font-size:40px;">✅</div>
+      <div class="big">Redirection</div>
+      <p>Ton message WhatsApp est prêt. Envoie-le pour qu'on prépare ta livraison !</p>
+      <button class="btn btn-outline" style="margin-top:18px;" id="closeConfirmBtn">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js?v=2"></script>
+
+</body>
+</html>
