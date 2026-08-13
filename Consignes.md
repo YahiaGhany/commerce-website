@@ -48,15 +48,21 @@ Ne touche qu'à style.css (et au markup dans index-13.html/script.js seulement s
 ```
 Objectif : remplacer le tableau `products` codé en dur dans script.js par des données stockées dans une base de données, pour permettre plus tard un back-office qui persiste vraiment les changements.
 
-Mets en place Firebase (Firestore pour les données produits + Firebase Storage pour les images, Firebase Hosting si pertinent) car c'est gratuit pour ce volume, sans serveur à maintenir, et simple à connecter à un site statique HTML/JS :
-1. Crée une collection Firestore "products" avec les champs : id, name, price, img (URL Storage), desc, sold_out (boolean), created_at.
+Important : Firebase Storage exige désormais une carte bancaire liée (plan payant "Blaze" obligatoire depuis février 2026, même si l'usage reste gratuit) — donc ne PAS l'utiliser, je veux zéro carte bancaire à renseigner nulle part.
+
+Utilise cette combinaison, entièrement gratuite et sans carte bancaire :
+- Firestore (base de données) sur le plan Firebase gratuit "Spark" — pas de carte requise pour Firestore ni pour Firebase Authentication. Quotas gratuits largement suffisants pour cette boutique (~50k lectures/jour, ~20k écritures/jour).
+- Cloudinary (plan gratuit "Free forever", pas de carte requise) pour héberger les images produits — 25 crédits/mois gratuits, largement suffisants pour une vingtaine de casquettes (chaque crédit ≈ 1 Go de stockage ou de transfert).
+
+Étapes :
+1. Crée une collection Firestore "products" avec les champs : id, name, price, img (URL Cloudinary), desc, sold_out (boolean), created_at.
 2. Ajoute une collection "promotions" (ou des champs sur un document "settings") pour stocker les règles de promo actuelles (ex: "2 achetées = -50 DH", "3 achetées = 4ème offerte") de façon éditable, au lieu du texte en dur dans le bandeau promo et dans cartPromo().
-3. Migre les 18 produits existants (avec leurs images actuelles dans assets/images/) vers Firestore + Storage via un script de migration ponctuel.
+3. Migre les 18 produits existants vers Firestore : upload leurs images actuelles (dans assets/images/) vers Cloudinary via un script de migration ponctuel, puis enregistre les URLs Cloudinary résultantes dans les documents Firestore.
 4. Modifie script.js pour charger les produits et les promotions depuis Firestore au chargement de la page (au lieu du tableau en dur), en gardant EXACTEMENT le même rendu visuel et les mêmes fonctions (dotHTML, openProduct, cartPromo, etc.) — seule la source des données change.
 5. Affiche un badge "ÉPUISÉ" sur les produits où sold_out=true, à la fois sur le mur (.slot) et sur la fiche produit, et empêche l'ajout au panier dans ce cas (bouton désactivé + message clair).
 6. Garde un état de chargement propre (ex: squelette ou spinner discret pendant que les produits arrivent de Firestore) pour éviter un mur vide au premier chargement.
 
-Explique-moi à la fin les identifiants/config Firebase que je dois créer moi-même dans la console Firebase (projet, clé API, etc.) puisque tu ne peux pas créer le compte à ma place.
+Explique-moi à la fin les comptes que je dois créer moi-même (projet Firebase + compte Cloudinary gratuit) et les identifiants/clés à récupérer, puisque tu ne peux pas créer ces comptes à ma place. Précise bien qu'aucun des deux ne doit me demander de carte bancaire — si un écran en réclame une, arrête-toi et préviens-moi avant de continuer.
 ```
 
 ---
@@ -66,7 +72,7 @@ Explique-moi à la fin les identifiants/config Firebase que je dois créer moi-m
 ```
 Objectif : créer une page d'administration séparée (ex: admin.html + admin.js), non liée dans la nav publique, permettant au gérant de :
 1. Voir la liste de tous les produits (nom, prix, statut, aperçu photo).
-2. Ajouter un nouveau produit (nom, prix, description, image — upload direct vers Firebase Storage).
+2. Ajouter un nouveau produit (nom, prix, description, image — upload direct vers Cloudinary via son API d'upload gratuite, puis enregistrement de l'URL résultante dans Firestore).
 3. Modifier un produit existant (tous les champs).
 4. Supprimer un produit (avec confirmation).
 5. Basculer un produit en "épuisé" / "disponible" en un clic (toggle).
@@ -74,7 +80,7 @@ Objectif : créer une page d'administration séparée (ex: admin.html + admin.js
 
 Contraintes :
 - Le style de l'admin doit être simple et fonctionnel (formulaires clairs, tableaux/listes), en réutilisant les variables CSS de style.css (--ink, --teal, --gold, --red) pour rester cohérent avec l'identité de marque, mais sans chercher l'esthétique "vitrine" du site public — priorité à la clarté d'usage pour quelqu'un de non-technique.
-- Chaque action (ajout/modif/suppression/toggle épuisé/modif promo) doit écrire directement dans Firestore/Storage et se refléter immédiatement sur le site public au rechargement.
+- Chaque action (ajout/modif/suppression/toggle épuisé/modif promo) doit écrire directement dans Firestore (et Cloudinary pour les nouvelles images) et se refléter immédiatement sur le site public au rechargement.
 - Prévois des messages de confirmation clairs ("Produit ajouté", "Modifications enregistrées", etc.) et une gestion d'erreur simple si l'upload image échoue.
 - N'ajoute pas encore d'authentification dans cette tâche — elle vient dans la tâche suivante. Pour l'instant l'admin est accessible juste via l'URL admin.html.
 ```
@@ -89,7 +95,7 @@ Objectif : protéger admin.html pour que seul le gérant puisse y accéder et mo
 Mets en place Firebase Authentication (email/mot de passe) :
 1. Crée un compte admin unique (email + mot de passe que je choisirai) via la console Firebase — indique-moi précisément les étapes à faire de mon côté.
 2. Ajoute un écran de connexion sur admin.html : sans être connecté, on ne voit ni les données ni les formulaires, juste le formulaire de login.
-3. Mets à jour les règles de sécurité Firestore/Storage pour que SEUL un utilisateur authentifié puisse écrire (create/update/delete) dans "products" et "promotions" — la lecture reste publique (nécessaire pour que le site vitrine affiche les produits sans compte).
+3. Mets à jour les règles de sécurité Firestore pour que SEUL un utilisateur authentifié puisse écrire (create/update/delete) dans "products" et "promotions" — la lecture reste publique (nécessaire pour que le site vitrine affiche les produits sans compte). Pour Cloudinary, utilise un "upload preset" non-signé restreint (dossier dédié, formats/tailles limités) plutôt qu'une clé API exposée côté client.
 4. Ajoute un bouton "Se déconnecter" visible une fois connecté.
 5. Vérifie que ces règles empêchent bien un utilisateur non connecté de modifier les données même en appelant Firestore directement depuis la console du navigateur.
 
@@ -106,11 +112,10 @@ Objectif : passe de finition sur l'ensemble du site public (index-13.html/style.
 Vérifie et corrige si besoin :
 1. Rendu mobile complet : header, hero, mur des casquettes, fiche produit, drawer panier, modal checkout — sur des largeurs 360px à 768px.
 2. Accessibilité : contraste texte suffisant sur tous les nouveaux éléments visuels ajoutés en tâche 1 et 2, alt text correct sur toutes les images produits (déjà en place, à vérifier), focus visible au clavier sur les nouveaux composants.
-3. Performance : compresse/optimise les images produits migrées vers Firebase Storage si elles sont lourdes (viser du WebP si possible), et vérifie qu'il n'y a pas de flash de contenu vide trop long au chargement à cause de l'appel Firestore.
+3. Performance : configure les URLs Cloudinary pour livrer les images en format optimisé (auto WebP/AVIF + redimensionnement via les paramètres de transformation d'URL de Cloudinary, sans surconsommer les 25 crédits/mois gratuits), et vérifie qu'il n'y a pas de flash de contenu vide trop long au chargement à cause de l'appel Firestore.
 4. Repasse une fois sur le bandeau promo et les textes de promotion pour vérifier qu'ils reflètent bien les données venant de Firestore (tâche 3) et pas un reliquat codé en dur.
 
 Liste-moi à la fin tout ce que tu as changé dans cette tâche.
-```
 
 ---
 

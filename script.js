@@ -4,66 +4,66 @@ const LOGO_DATA = "assets/images/logo_data.png";
     if(el) el.src = LOGO_DATA;
   });
 
-  const products = [
-    {id:0, name:"Orange NY", price:199, img:"orange_ny", desc:"Casquette 47 New York Yankees, couleur orange avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:1, name:"Bordeaux LA", price:199, img:"bordeaux_la", desc:"Casquette 47 LA (Los Angeles), couleur bordeaux avec logo LA blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:2, name:"Camel NY", price:199, img:"camel_ny", desc:"Casquette 47 New York Yankees, couleur camel avec logo NY ton sur ton. Coupe ajustée, visière incurvée."},
-    {id:3, name:"Vert Pétant NY", price:199, img:"vertpetant_ny", desc:"Casquette 47 New York Yankees, couleur vert pétant avec logo NY noir brodé. Coupe ajustée, visière incurvée."},
-    {id:4, name:"Rose NY", price:199, img:"rose_ny", desc:"Casquette 47 New York Yankees, couleur rose avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:5, name:"Violet NY", price:199, img:"violet_ny", desc:"Casquette 47 New York Yankees, couleur violet avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:6, name:"Bleu Marine NY", price:199, img:"bleumarine_ny", desc:"Casquette 47 New York Yankees, couleur bleu marine avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:7, name:"Bleu Ciel NY", price:199, img:"bleuciel_ny", desc:"Casquette 47 New York Yankees, couleur bleu ciel avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:8, name:"Vert Foncé NY (Logo Noir)", price:199, img:"vertfonce_ny", desc:"Casquette 47 New York Yankees, couleur vert foncé avec logo NY noir brodé. Coupe ajustée, visière incurvée."},
-    {id:9, name:"Lavande NY", price:199, img:"lavande_ny", desc:"Casquette 47 New York Yankees, couleur lavande avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:10, name:"Noir NY (Logo Rouge)", price:199, img:"noir_ny", desc:"Casquette 47 New York Yankees, couleur noir avec logo NY rouge brodé. Coupe ajustée, visière incurvée."},
-    {id:11, name:"Bleu Roi NY", price:199, img:"bleuroi_ny", desc:"Casquette 47 New York Yankees, couleur bleu roi avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:12, name:"Vert Foncé NY Script", price:199, img:"vertfonce_script_ny", desc:"Casquette 47 New York Yankees, couleur vert foncé avec écriture \"Yankees\" dorée brodée. Coupe ajustée, visière incurvée."},
-    {id:13, name:"Crème LA", price:199, img:"creme_la", desc:"Casquette New Era LA (Los Angeles), couleur crème et vert foncé avec logo LA bleu et broderie rose. Coupe ajustée, visière incurvée."},
-    {id:14, name:"Rouge NY", price:199, img:"rouge_ny", desc:"Casquette 47 New York Yankees, couleur rouge avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:15, name:"Vert Foncé NY (Logo Blanc)", price:199, img:"vertfonce_ny_blanc", desc:"Casquette 47 New York Yankees, couleur vert foncé avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:16, name:"Noir NY (Logo Blanc)", price:199, img:"noir_ny_blanc", desc:"Casquette 47 New York Yankees, couleur noir avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-    {id:17, name:"Jaune Stone Island", price:199, img:"jaune_stoneisland", desc:"Casquette 47 Stone Island, couleur jaune avec écusson compass brodé noir. Coupe ajustée, visière incurvée."},
-  ];
-
-  const CAP_IMAGES = {
-    orange_ny: "assets/images/Orange.png",
-    bordeaux_la: "assets/images/Bordeaux LA.png",
-    camel_ny: "assets/images/Camel.png",
-    vertpetant_ny: "assets/images/Vert Petant.png",
-    rose_ny: "assets/images/Rose.png",
-    violet_ny: "assets/images/Violet.png",
-    bleumarine_ny: "assets/images/Bleu marine.png",
-    bleuciel_ny: "assets/images/Bleu ciel.png",
-    vertfonce_ny: "assets/images/Vert Foncé NY.png",
-    lavande_ny: "assets/images/Lavande.png",
-    noir_ny: "assets/images/Noir Logo Rouge.png",
-    bleuroi_ny: "assets/images/Bleu Roi.png",
-    vertfonce_script_ny: "assets/images/Vert Foncé.png",
-    creme_la: "assets/images/CrémeLA.png",
-    rouge_ny: "assets/images/Rouge.png",
-    vertfonce_ny_blanc: "assets/images/Vert Logo blanc.png",
-    noir_ny_blanc: "assets/images/Noir logo Blanc.png",
-    jaune_stoneisland: "assets/images/Jaune Stone Island.png",
+  // ==========================================
+  // CONFIGURATION FIREBASE (À REMPLIR PAR LE CLIENT)
+  // ==========================================
+  const firebaseConfig = {
+    // ⚠️ COLLE TON CONFIG FIREBASE ICI ⚠️
+    // apiKey: "...",
+    // authDomain: "...",
+    // projectId: "...",
+    // ...
   };
 
-  function dotHTML(p, sizeClass){
-    return `<img class="cap-photo ${sizeClass||''}" src="${CAP_IMAGES[p.img]}" alt="${p.name}">`;
+  // Initialisation (S'exécute uniquement si la config est présente)
+  let db;
+  if(firebaseConfig.projectId) {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+  } else {
+    console.warn("⚠️ Firebase non configuré. Les produits ne s'afficheront pas.");
   }
 
-  // ---- Render wall grid ----
+  // État global
+  let products = [];
+  let promoRules = { promo_2: -50, promo_3_free: true };
+
+  // Optimisation Cloudinary
+  function optimizeImg(url) {
+    if(!url || !url.includes('cloudinary.com')) return url;
+    return url.replace('/upload/', '/upload/f_auto,q_auto,w_500/');
+  }
+
+  // Rendu de l'image avec badge si épuisé
+  function dotHTML(p, sizeClass) {
+    let html = `<img class="cap-photo ${sizeClass||''}" src="${optimizeImg(p.img)}" alt="${p.name}">`;
+    if (p.sold_out) {
+      html += `<div class="sold-out-overlay"></div><div class="sold-out-badge">ÉPUISÉ</div>`;
+    }
+    return html;
+  }
+
+
+
   const grid = document.getElementById('wallGrid');
-  products.forEach((p) => {
-    const slot = document.createElement('div');
-    slot.className = 'slot';
-    slot.addEventListener('click', () => openProduct(p.id));
-    slot.innerHTML = `
-      <div class="peg"></div>
-      <div class="slot-frame">${dotHTML(p)}</div>
-      <div class="slot-name">${p.name}</div>
-      <div class="slot-footer"><span class="price-tag">${p.price} DH</span></div>
-    `;
-    grid.appendChild(slot);
-  });
+  
+  function renderProducts() {
+    grid.innerHTML = '';
+    products.forEach((p) => {
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      slot.addEventListener('click', () => openProduct(p.id));
+      slot.innerHTML = `
+        <div class="peg"></div>
+        <div class="slot-frame">${dotHTML(p)}</div>
+        <div class="slot-name">${p.name}</div>
+        <div class="slot-footer"><span class="price-tag">${p.price} DH</span></div>
+      `;
+      grid.appendChild(slot);
+    });
+  }
 
   // ---- View routing (store vs product) ----
   const storeView = document.getElementById('storeView');
@@ -79,6 +79,19 @@ const LOGO_DATA = "assets/images/logo_data.png";
     document.getElementById('pPrice').textContent = currentProduct.price + ' DH';
     document.getElementById('pDesc').textContent = currentProduct.desc;
     document.getElementById('qtyVal').textContent = currentQty;
+    
+    // Check if sold out
+    const addBtn = document.getElementById('addBtn');
+    if(currentProduct.sold_out) {
+      addBtn.textContent = "ÉPUISÉ";
+      addBtn.style.opacity = "0.5";
+      addBtn.style.pointerEvents = "none";
+    } else {
+      addBtn.textContent = "AJOUTER";
+      addBtn.style.opacity = "1";
+      addBtn.style.pointerEvents = "auto";
+    }
+
     storeView.style.display = 'none';
     productView.style.display = 'block';
     window.scrollTo({top:0, behavior:'instant' in document.documentElement.style ? 'instant' : 'auto'});
@@ -112,10 +125,16 @@ const LOGO_DATA = "assets/images/logo_data.png";
   function cartTotalQty(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
   function cartPromo(){
     const qty = cartTotalQty();
-    const groups4 = Math.floor(qty/4);
-    const remainder = qty % 4;
-    const freeUnits = groups4;
-    const discount = Math.floor(remainder/2) * 50;
+    let freeUnits = 0;
+    let discount = 0;
+    
+    if (promoRules.promo_3_free) {
+      freeUnits = Math.floor(qty / 4);
+    }
+    if (promoRules.promo_2) {
+      const remainder = qty % 4;
+      discount = Math.floor(remainder / 2) * Math.abs(promoRules.promo_2);
+    }
     return {freeUnits, discount};
   }
   function cartTotalPrice(){
@@ -134,7 +153,7 @@ const LOGO_DATA = "assets/images/logo_data.png";
   }
 
   function dotHTMLsmall(p){
-    return `<img class="dot-sm" src="${CAP_IMAGES[p.img]}" alt="${p.name}">`;
+    return `<img class="dot-sm" src="${optimizeImg(p.img)}" alt="${p.name}">`;
   }
 
   function renderDrawer(){
@@ -272,3 +291,43 @@ const LOGO_DATA = "assets/images/logo_data.png";
   // ---- Placeholder social links — swap with real Instagram / WhatsApp number ----
   document.getElementById('igLink').href = "https://www.instagram.com/casqueta_halawa";
   document.getElementById('waLink').href = "https://wa.me/212668050505";
+
+  // ---- Fetch from Firebase ----
+  async function loadData() {
+    if(!db) return; // Si la config manque, ne rien faire
+    
+    // Afficher les squelettes
+    grid.innerHTML = Array(6).fill(`
+      <div class="slot">
+        <div class="slot-frame skeleton skeleton-box"></div>
+        <div class="skeleton skeleton-text short"></div>
+      </div>
+    `).join('');
+
+    try {
+      // Fetch Promotions
+      const promoDoc = await db.collection('settings').doc('promotions').get();
+      if(promoDoc.exists) {
+        const pData = promoDoc.data();
+        promoRules = pData;
+        if(pData.text_bandeau) {
+          document.querySelector('.promo-track').innerHTML = pData.text_bandeau + " &middot; " + pData.text_bandeau;
+        }
+      }
+
+      // Fetch Products
+      const snap = await db.collection('products').orderBy('created_at', 'desc').get();
+      products = [];
+      snap.forEach(doc => {
+        products.push(doc.data());
+      });
+      renderProducts();
+
+    } catch (err) {
+      console.error("Erreur Firebase :", err);
+      grid.innerHTML = "<p>Erreur de chargement des produits.</p>";
+    }
+  }
+
+  loadData();
+});

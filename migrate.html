@@ -2,42 +2,45 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Migration Firebase Halawa</title>
+  <title>Migration Firestore + Cloudinary</title>
   <style>
-    body { font-family: monospace; padding: 40px; background: #111; color: #eee; }
+    body { font-family: monospace; padding: 40px; background: #111; color: #eee; max-width:800px; margin:0 auto;}
     h1 { color: #fff; }
-    textarea { width: 100%; height: 150px; background: #222; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; }
-    button { padding: 12px 24px; background: #D6472F; color: #fff; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
+    .box { background: #222; padding: 20px; border: 1px solid #444; margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: bold; color: #aaa; }
+    input, textarea { width: 100%; box-sizing: border-box; background: #111; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; margin-bottom:16px;}
+    textarea { height: 120px; }
+    button { padding: 12px 24px; background: #D6472F; color: #fff; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
-    #log { margin-top: 30px; background: #000; padding: 20px; border-radius: 4px; border: 1px solid #333; height: 300px; overflow-y: auto; }
+    #log { margin-top: 30px; background: #000; padding: 20px; border: 1px solid #333; height: 350px; overflow-y: auto; }
     .success { color: #4CAF50; }
     .error { color: #F44336; }
     .info { color: #2196F3; }
   </style>
 </head>
 <body>
-  <h1>Outil de Migration Firebase (Tâche 3)</h1>
-  <p>1. Copie-colle ton objet <b>firebaseConfig</b> ci-dessous (juste l'intérieur des accolades <code>{ ... }</code>) :</p>
-  <textarea id="configInput" placeholder='{
-  "apiKey": "...",
-  "authDomain": "...",
-  "projectId": "...",
-  "storageBucket": "...",
-  "messagingSenderId": "...",
-  "appId": "..."
-}'></textarea>
-  <br>
-  <button id="startBtn">Démarrer la Migration</button>
+  <h1>Migration Firestore + Cloudinary (Tâche 3)</h1>
+  
+  <div class="box">
+    <label>1. Configuration Firebase (Objet firebaseConfig)</label>
+    <textarea id="fbConfig" placeholder='{ "apiKey": "...", "projectId": "..." }'></textarea>
 
-  <div id="log">En attente...</div>
+    <label>2. Cloudinary : Cloud Name</label>
+    <input type="text" id="cloudName" placeholder="ex: dqwerty123">
+
+    <label>3. Cloudinary : Upload Preset (Unsigned)</label>
+    <input type="text" id="uploadPreset" placeholder="ex: halawa_preset">
+
+    <button id="startBtn">Démarrer la Migration</button>
+  </div>
+
+  <div id="log">En attente des identifiants...</div>
 
   <!-- Firebase v9 SDK (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
   <script>
-    // Liste des produits actuels
     const products = [
       {id:0, name:"Orange NY", price:199, img:"assets/images/Orange.png", desc:"Casquette 47 New York Yankees, couleur orange avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
       {id:1, name:"Bordeaux LA", price:199, img:"assets/images/Bordeaux LA.png", desc:"Casquette 47 LA (Los Angeles), couleur bordeaux avec logo LA blanc brodé. Coupe ajustée, visière incurvée."},
@@ -67,64 +70,70 @@
       logEl.scrollTop = logEl.scrollHeight;
     }
 
+    async function uploadToCloudinary(fileBlob, filename, cloudName, preset) {
+      const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+      const formData = new FormData();
+      formData.append('file', fileBlob, filename);
+      formData.append('upload_preset', preset);
+      
+      const res = await fetch(url, { method: 'POST', body: formData });
+      if(!res.ok) throw new Error("Cloudinary upload failed");
+      const data = await res.json();
+      return data.secure_url;
+    }
+
     btn.addEventListener('click', async () => {
-      let configStr = document.getElementById('configInput').value.trim();
-      if(!configStr) return alert("Veuillez coller la configuration Firebase.");
+      let fbStr = document.getElementById('fbConfig').value.trim();
+      let cName = document.getElementById('cloudName').value.trim();
+      let cPreset = document.getElementById('uploadPreset').value.trim();
+
+      if(!fbStr || !cName || !cPreset) return alert("Remplis tous les champs.");
 
       let config;
       try {
-        // Evaluate the string as an object if it's not strict JSON
-        config = (new Function("return " + configStr))();
-        if(!config.projectId) throw new Error("projectId manquant");
+        config = (new Function("return " + fbStr))();
+        if(!config.projectId) throw new Error();
       } catch(e) {
-        return alert("Format de configuration invalide. Assurez-vous que c'est un objet JSON valide.");
+        return alert("Configuration Firebase invalide.");
       }
 
       btn.disabled = true;
-      log("Initialisation Firebase...", "info");
+      log("Initialisation Firestore...", "info");
       
       try {
-        firebase.initializeApp(config);
+        if (!firebase.apps.length) firebase.initializeApp(config);
         const db = firebase.firestore();
-        const storage = firebase.storage();
 
-        // 1. Upload des promotions
-        log("Création du document de promotions...", "info");
+        log("Création du document promotions...", "info");
         await db.collection("settings").doc("promotions").set({
           text_bandeau: "2 CASQUETTES ACHETÉES = -50 DH · 3 ACHETÉES, LA 4ÈME OFFERTE · 199 DH L'UNITÉ · LIVRAISON PARTOUT AU MAROC",
           promo_2: -50,
           promo_3_free: true
         });
-        log("Promotions configurées.", "success");
 
-        // 2. Upload des images et création des produits
         for(let p of products) {
           log(`Traitement de ${p.name}...`, "info");
-          
           try {
-            // Fetch local image
             const response = await fetch(p.img);
-            if(!response.ok) throw new Error("Image introuvable localement");
+            if(!response.ok) throw new Error("Image locale introuvable");
             const blob = await response.blob();
             
-            // Upload to Storage
+            // Cloudinary Upload
             const filename = p.img.split('/').pop();
-            const storageRef = storage.ref(`products/${filename}`);
-            await storageRef.put(blob);
-            const downloadUrl = await storageRef.getDownloadURL();
-            log(`- Image uploadée : ${downloadUrl}`, "success");
+            const cloudinaryUrl = await uploadToCloudinary(blob, filename, cName, cPreset);
+            log(`- Image sur Cloudinary : ${cloudinaryUrl}`, "success");
 
-            // Save to Firestore
+            // Firestore Save
             await db.collection("products").doc(p.id.toString()).set({
               id: p.id,
               name: p.name,
               price: p.price,
-              img: downloadUrl,
+              img: cloudinaryUrl,
               desc: p.desc,
               sold_out: false,
               created_at: firebase.firestore.FieldValue.serverTimestamp()
             });
-            log(`- Produit ${p.name} enregistré dans Firestore.`, "success");
+            log(`- Produit enregistré dans Firestore.`, "success");
 
           } catch (err) {
             log(`Erreur sur ${p.name} : ${err.message}`, "error");
@@ -132,7 +141,7 @@
         }
 
         log("🎉 MIGRATION TERMINÉE AVEC SUCCÈS !", "success");
-        log("Tu peux maintenant donner ta config Firebase à ton assistant IA pour qu'il mette à jour le site.", "info");
+        log("Transmets tes identifiants à Antigravity pour finaliser le code !", "info");
 
       } catch (error) {
         log(`Erreur fatale : ${error.message}`, "error");
