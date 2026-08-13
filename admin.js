@@ -18,6 +18,15 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
+const auth = firebase.auth();
+
+// DOM Elements - Auth
+const loginView = document.getElementById('loginView');
+const dashboardView = document.getElementById('dashboardView');
+const loginEmail = document.getElementById('loginEmail');
+const loginPwd = document.getElementById('loginPwd');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
 
 // DOM Elements
 const promoText = document.getElementById('promoText');
@@ -82,8 +91,9 @@ savePromoBtn.addEventListener('click', async () => {
 // 2. Charger les Produits
 // ==============================
 function loadProducts() {
+  if(productsUnsubscribe) productsUnsubscribe();
   // Real-time listener for products
-  db.collection('products').orderBy('created_at', 'desc').onSnapshot(snap => {
+  productsUnsubscribe = db.collection('products').orderBy('created_at', 'desc').onSnapshot(snap => {
     productsList = [];
     productsTableBody.innerHTML = "";
     snap.forEach(doc => {
@@ -244,6 +254,48 @@ saveProductBtn.addEventListener('click', async () => {
   loadingOverlay.classList.remove('active');
 });
 
-// Initialization
-loadPromos();
-loadProducts();
+// ==============================
+// 4. Authentification
+// ==============================
+loginBtn.addEventListener('click', async () => {
+  const email = loginEmail.value.trim();
+  const pwd = loginPwd.value.trim();
+  if(!email || !pwd) return alert("Veuillez remplir l'email et le mot de passe.");
+  
+  loadingOverlay.classList.add('active');
+  try {
+    await auth.signInWithEmailAndPassword(email, pwd);
+  } catch(err) {
+    alert("Erreur de connexion : " + err.message);
+  }
+  loadingOverlay.classList.remove('active');
+});
+
+logoutBtn.addEventListener('click', () => {
+  auth.signOut();
+});
+
+let productsUnsubscribe = null;
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    // Connecté
+    loginView.style.display = "none";
+    dashboardView.style.display = "block";
+    loadPromos();
+    loadProducts();
+  } else {
+    // Déconnecté
+    loginView.style.display = "block";
+    dashboardView.style.display = "none";
+    
+    // Nettoyage des données pour des raisons de sécurité
+    productsTableBody.innerHTML = "";
+    if(productsUnsubscribe) {
+      productsUnsubscribe();
+      productsUnsubscribe = null;
+    }
+  }
+});
+
+// Le chargement initial (loadPromos, loadProducts) est maintenant géré par onAuthStateChanged.

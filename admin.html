@@ -46,14 +46,36 @@
 
     .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center; z-index: 200; font-family: 'Anton'; font-size: 24px; }
     .loading-overlay.active { display: flex; }
+
+    /* Login View */
+    .login-container { max-width: 400px; margin: 100px auto; background: var(--bg-color); padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
+    .login-container h1 { font-family: 'Anton'; font-size: 32px; color: var(--ink); margin-bottom: 20px; }
   </style>
 </head>
 <body>
 
-  <div class="admin-container">
+  <!-- Login View -->
+  <div id="loginView" class="login-container">
+    <h1>Accès Sécurisé</h1>
+    <div class="form-group" style="text-align: left;">
+      <label>Email Admin</label>
+      <input type="email" id="loginEmail" placeholder="admin@halawa.ma">
+    </div>
+    <div class="form-group" style="text-align: left;">
+      <label>Mot de passe</label>
+      <input type="password" id="loginPwd" placeholder="••••••••">
+    </div>
+    <button class="btn" id="loginBtn" style="width: 100%; margin-top: 10px;">Se Connecter</button>
+  </div>
+
+  <!-- Dashboard View (Hidden by default) -->
+  <div class="admin-container" id="dashboardView" style="display: none;">
     <div class="admin-header">
       <h1>Administration HALAWA</h1>
-      <a href="index-13.html" class="btn" style="text-decoration:none; background:var(--teal);">Voir le site</a>
+      <div style="display:flex; gap:10px;">
+        <a href="index-13.html" class="btn" style="text-decoration:none; background:var(--teal);">Voir le site</a>
+        <button class="btn btn-red" id="logoutBtn">Déconnexion</button>
+      </div>
     </div>
 
     <!-- Promotions Section -->
@@ -141,6 +163,7 @@
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <!-- Admin Script -->
