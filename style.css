@@ -159,14 +159,7 @@ nav.links a:hover::after{width:100%;}
   transition:transform .4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Woven Label (Pastille) on product frames */
-.slot-frame::after, .product-visual::after{
-  content:"CH"; position:absolute; bottom:16px; right:0;
-  background:var(--red); color:var(--bg-color);
-  font-family:'Anton', sans-serif; font-size:14px;
-  padding:4px 10px 2px 10px;
-  z-index:3; letter-spacing:1px;
-}
+
 
 .slot-info{display:flex; justify-content:space-between; align-items:flex-start; padding:0 4px;}
 .slot-name{font-family:'Anton'; font-size:20px; text-transform:uppercase; letter-spacing:0.01em; color:var(--ink); line-height:1.1;}
