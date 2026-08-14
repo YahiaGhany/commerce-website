@@ -92,6 +92,12 @@ const LOGO_DATA = "assets/images/logo_data.png";
     document.getElementById('pDesc').textContent = currentProduct.desc;
     document.getElementById('qtyVal').textContent = currentQty;
     
+    // Dynamic promo note
+    let promoNotes = [];
+    if(promoRules.promo_2) promoNotes.push(`2 achetées = -${promoRules.promo_2} DH`);
+    if(promoRules.promo_3_free) promoNotes.push(`3 achetées = 4ème offerte`);
+    document.getElementById('pPromoNote').textContent = promoNotes.length ? `🎁 Promo : ${promoNotes.join(' | ')}` : '';
+    
     // Check if sold out
     const addCartBtn = document.getElementById('addCartBtn');
     const buyNowBtn = document.getElementById('buyNowBtn');
@@ -200,7 +206,9 @@ const LOGO_DATA = "assets/images/logo_data.png";
             <button data-act="minus" data-id="${id}">−</button>
             <span class="qv">${qty}</span>
             <button data-act="plus" data-id="${id}">+</button>
-            <button class="remove-x" data-act="remove" data-id="${id}">retirer</button>
+            <button class="cart-item-trash" data-act="remove" data-id="${id}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
           </div>
         </div>`;
     }).join('');
@@ -219,6 +227,31 @@ const LOGO_DATA = "assets/images/logo_data.png";
 
     const totalQty = cartTotalQty();
     const {freeUnits, discount} = cartPromo();
+    
+    // Update Promo Hint Bar
+    const hintBar = document.getElementById('cartPromoHint');
+    if (totalQty === 0) {
+      hintBar.style.display = 'none';
+    } else {
+      hintBar.style.display = 'block';
+      const remainder = totalQty % 4;
+      if (promoRules.promo_3_free && remainder === 0 && totalQty > 0) {
+        hintBar.textContent = "Félicitations, 1 casquette OFFERTE ! 🎁";
+      } else if (promoRules.promo_3_free && remainder === 3) {
+        hintBar.textContent = "Plus qu'1 casquette pour avoir la 4ème GRATUITE ! 🔥";
+      } else if (promoRules.promo_2 && remainder === 2) {
+        if (promoRules.promo_3_free) {
+           hintBar.textContent = `Réduction appliquée ! Ajoute 1 casquette pour la 4ème offerte ! 🎁`;
+        } else {
+           hintBar.textContent = `Félicitations, réduction de -${promoRules.promo_2} DH appliquée ! 🎉`;
+        }
+      } else if (promoRules.promo_2 && remainder === 1) {
+        hintBar.textContent = `Encore 1 casquette pour débloquer -${promoRules.promo_2} DH !`;
+      } else {
+        hintBar.style.display = 'none';
+      }
+    }
+
     document.getElementById('sumQty').textContent = totalQty;
     document.getElementById('sumFreeRow').style.display = freeUnits > 0 ? 'flex' : 'none';
     document.getElementById('sumFree').textContent = '−' + freeUnits;

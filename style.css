@@ -277,8 +277,16 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--ink); outline-offs
 .drawer.open{transform:translateX(0);}
 .drawer-head{display:flex; align-items:center; justify-content:space-between; padding:26px 28px; border-bottom:1px solid var(--line);}
 .drawer-head h3{font-family:'Anton'; text-transform:uppercase; font-size:24px; color:var(--ink);}
-.drawer-close{background:none; border:none; font-size:26px; cursor:pointer; color:var(--ink);}
-.drawer-body{flex:1; overflow-y:auto; padding:20px 28px;}
+.drawer-close{background:transparent; border:none; font-size:26px; cursor:pointer;}
+
+.cart-promo-hint {
+  background: var(--ink); color: var(--gold);
+  font-family: 'Space Mono'; font-weight: 700; font-size: 13px;
+  text-align: center; padding: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.drawer-body{flex:1; overflow-y:auto; padding:20px;}
 .cart-empty{font-family:'Space Mono'; font-size:14px; color:var(--ink-light); text-align:center; margin-top:50px;}
 .cart-item{display:flex; align-items:center; gap:16px; padding:16px 0; border-bottom:1px solid var(--line);}
 .dot-sm{width:50px; height:50px; flex-shrink:0; object-fit:contain; background:var(--bg-dim); padding:4px;}
@@ -289,7 +297,15 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--ink); outline-offs
 .cart-item-actions button{background:none; border:1px solid var(--line); width:28px; height:28px; cursor:pointer; color:var(--ink);}
 .cart-item-actions .qv{font-family:'Space Mono'; font-size:13px; width:20px; text-align:center; color:var(--ink);}
 .remove-x{background:none; border:none; cursor:pointer; color:var(--red); font-size:13px; font-family:'Space Mono'; margin-left:4px; text-decoration:underline;}
-.drawer-foot{border-top:1px solid var(--line); padding:24px 28px 30px;}
+
+.cart-item-trash {
+  background: transparent; border: none; cursor: pointer;
+  padding: 4px; display: flex; align-items: center; justify-content: center;
+  opacity: 0.5; transition: opacity 0.2s; margin-left: auto;
+}
+.cart-item-trash:hover { opacity: 1; color: var(--red); }
+
+.drawer-foot{border-top:1px solid var(--line); padding:20px;}
 .sum-row{display:flex; justify-content:space-between; font-family:'Space Mono'; font-size:14px; margin-bottom:10px; color:var(--ink-light);}
 .sum-row.total{font-size:18px; font-weight:700; border-top:1px solid var(--line); padding-top:12px; margin-top:8px; color:var(--ink);}
 .sum-row.discount{color:var(--red);}
