@@ -56,7 +56,17 @@ const LOGO_DATA = "assets/images/logo_data.png";
     products.forEach((p) => {
       const slot = document.createElement('div');
       slot.className = 'slot';
-      slot.addEventListener('click', () => openProduct(p.id));
+      slot.tabIndex = 0; // Accessibilité : navigation au clavier
+      
+      const openProd = () => openProduct(p.id);
+      slot.addEventListener('click', openProd);
+      slot.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openProd();
+        }
+      });
+      
       slot.innerHTML = `
         <div class="peg"></div>
         <div class="slot-frame">${dotHTML(p)}</div>
