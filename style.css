@@ -189,7 +189,13 @@ nav.links a:hover::after {
 }
 
 /* ===== Hero — Stark & Bold ===== */
-.hero{position:relative; padding:100px 28px 80px; overflow:hidden; z-index:0;}
+.hero {
+  position: relative;
+  padding: 100px 28px 80px;
+  overflow: hidden;
+  z-index: 0;
+}
+
 .hero::before {
   content: '';
   position: absolute;
@@ -199,7 +205,15 @@ nav.links a:hover::after {
   filter: grayscale(100%);
   opacity: 0.3;
 }
-.hero-grid{max-width:1180px; margin:0 auto; display:flex; flex-direction:column; align-items:center; text-align:center;}
+
+.hero-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 
 .eyebrow {
   display: inline-flex;
@@ -282,9 +296,14 @@ nav.links a:hover::after {
   color: var(--bg-color);
 }
 
-.hero-visual{
-  position:relative; aspect-ratio:4/3; background:transparent;
-  display:flex; align-items:center; justify-content:center; overflow:hidden;
+.hero-visual {
+  position: relative;
+  aspect-ratio: 4/3;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .hero-cap-icon {
@@ -1333,11 +1352,13 @@ button:focus-visible {
   display: flex;
   border-top: 2px solid var(--ink);
 }
+
 .bottom-slider-track {
   display: flex;
   width: max-content;
   animation: bottom-scroll 35s linear infinite;
 }
+
 .bottom-slider-track img {
   height: 55vh;
   min-height: 320px;
@@ -1347,15 +1368,23 @@ button:focus-visible {
   filter: grayscale(20%) contrast(110%);
   transition: filter 0.4s ease;
 }
+
 .bottom-slider-track img:hover {
   filter: grayscale(0%) contrast(100%);
 }
+
 @media(max-width:860px) {
   .bottom-slider-track img {
     height: 45vh;
   }
 }
+
 @keyframes bottom-scroll {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }

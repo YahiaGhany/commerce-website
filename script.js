@@ -40,7 +40,13 @@ function optimizeImg(url) {
 
 // Rendu de l'image avec badge si épuisé
 function dotHTML(p, sizeClass) {
-  let html = `<img class="cap-photo ${sizeClass || ''}" src="${optimizeImg(p.img)}" alt="${p.name}">`;
+  let extraClass = sizeClass || '';
+  const n = (p.name || '').toLowerCase();
+  if (n.includes('bordeaux') || n.includes('orange') || n.includes('rouge')) {
+    extraClass += ' cap-dezoom';
+  }
+  
+  let html = `<img class="cap-photo ${extraClass}" src="${optimizeImg(p.img)}" alt="${p.name || 'Casquette'}">`;
   if (p.sold_out) {
     html += `<div class="sold-out-overlay"></div><div class="sold-out-badge">ÉPUISÉ</div>`;
   }
@@ -100,22 +106,15 @@ function openProduct(id) {
 
   // Check if sold out
   const addCartBtn = document.getElementById('addCartBtn');
-  const buyNowBtn = document.getElementById('buyNowBtn');
 
   if (currentProduct.sold_out) {
     addCartBtn.textContent = "ÉPUISÉ";
     addCartBtn.style.opacity = "0.5";
     addCartBtn.style.pointerEvents = "none";
-
-    buyNowBtn.style.opacity = "0.5";
-    buyNowBtn.style.pointerEvents = "none";
   } else {
-    addCartBtn.textContent = "Ajouter";
+    addCartBtn.textContent = "Ajouter au panier";
     addCartBtn.style.opacity = "1";
     addCartBtn.style.pointerEvents = "auto";
-
-    buyNowBtn.style.opacity = "1";
-    buyNowBtn.style.pointerEvents = "auto";
   }
 
   storeView.style.display = 'none';
@@ -274,10 +273,6 @@ document.getElementById('addCartBtn').addEventListener('click', () => {
   addToCart(currentProduct.id, currentQty);
   openDrawer();
 });
-document.getElementById('buyNowBtn').addEventListener('click', () => {
-  addToCart(currentProduct.id, currentQty);
-  openCheckout();
-});
 document.getElementById('goCheckoutBtn').addEventListener('click', openCheckout);
 
 // ---- Checkout modal ----
@@ -330,7 +325,7 @@ document.getElementById('submitOrderBtn').addEventListener('click', () => {
     `Téléphone: ${encodeURIComponent(phone)}%0A` +
     `Adresse: ${encodeURIComponent(address)}%0A%0A` +
     `Paiement en espèces à la livraison.`;
-  window.open(`https://wa.me/212668050505?text=${msg}`, '_blank');
+  window.open(`https://wa.me/212661343404?text=${msg}`, '_blank');
   document.getElementById('checkoutForm').style.display = 'none';
   document.getElementById('confirmView').style.display = 'block';
 });
@@ -343,7 +338,7 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
 // ---- Placeholder social links — swap with real Instagram / WhatsApp number ----
 document.getElementById('igLink').href = "https://www.instagram.com/casqueta_halawa";
-document.getElementById('waLink').href = "https://wa.me/212668050505";
+document.getElementById('waLink').href = "https://wa.me/212661343404";
 
 // ---- Fetch from Firebase ----
 async function loadData() {
