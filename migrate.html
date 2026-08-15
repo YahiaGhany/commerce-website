@@ -1,26 +1,94 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <title>Migration Firestore + Cloudinary</title>
   <style>
-    body { font-family: monospace; padding: 40px; background: #111; color: #eee; max-width:800px; margin:0 auto;}
-    h1 { color: #fff; }
-    .box { background: #222; padding: 20px; border: 1px solid #444; margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: bold; color: #aaa; }
-    input, textarea { width: 100%; box-sizing: border-box; background: #111; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; margin-bottom:16px;}
-    textarea { height: 120px; }
-    button { padding: 12px 24px; background: #D6472F; color: #fff; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    #log { margin-top: 30px; background: #000; padding: 20px; border: 1px solid #333; height: 350px; overflow-y: auto; }
-    .success { color: #4CAF50; }
-    .error { color: #F44336; }
-    .info { color: #2196F3; }
+    body {
+      font-family: monospace;
+      padding: 40px;
+      background: #111;
+      color: #eee;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #fff;
+    }
+
+    .box {
+      background: #222;
+      padding: 20px;
+      border: 1px solid #444;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #aaa;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: #111;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 10px;
+      font-family: monospace;
+      margin-bottom: 16px;
+    }
+
+    textarea {
+      height: 120px;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #D6472F;
+      color: #fff;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #log {
+      margin-top: 30px;
+      background: #000;
+      padding: 20px;
+      border: 1px solid #333;
+      height: 350px;
+      overflow-y: auto;
+    }
+
+    .success {
+      color: #4CAF50;
+    }
+
+    .error {
+      color: #F44336;
+    }
+
+    .info {
+      color: #2196F3;
+    }
   </style>
 </head>
+
 <body>
   <h1>Migration Firestore + Cloudinary (Tâche 3)</h1>
-  
+
   <div class="box">
     <label>1. Configuration Firebase (Objet firebaseConfig)</label>
     <textarea id="fbConfig" placeholder='{ "apiKey": "...", "projectId": "..." }'></textarea>
@@ -42,30 +110,30 @@
 
   <script>
     const products = [
-      {id:0, name:"Orange NY", price:199, img:"assets/images/Orange.png", desc:"Casquette 47 New York Yankees, couleur orange avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:1, name:"Bordeaux LA", price:199, img:"assets/images/Bordeaux LA.png", desc:"Casquette 47 LA (Los Angeles), couleur bordeaux avec logo LA blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:2, name:"Camel NY", price:199, img:"assets/images/Camel.png", desc:"Casquette 47 New York Yankees, couleur camel avec logo NY ton sur ton. Coupe ajustée, visière incurvée."},
-      {id:3, name:"Vert Pétant NY", price:199, img:"assets/images/Vert Petant.png", desc:"Casquette 47 New York Yankees, couleur vert pétant avec logo NY noir brodé. Coupe ajustée, visière incurvée."},
-      {id:4, name:"Rose NY", price:199, img:"assets/images/Rose.png", desc:"Casquette 47 New York Yankees, couleur rose avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:5, name:"Violet NY", price:199, img:"assets/images/Violet.png", desc:"Casquette 47 New York Yankees, couleur violet avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:6, name:"Bleu Marine NY", price:199, img:"assets/images/Bleu marine.png", desc:"Casquette 47 New York Yankees, couleur bleu marine avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:7, name:"Bleu Ciel NY", price:199, img:"assets/images/Bleu ciel.png", desc:"Casquette 47 New York Yankees, couleur bleu ciel avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:8, name:"Vert Foncé NY (Logo Noir)", price:199, img:"assets/images/Vert Foncé NY.png", desc:"Casquette 47 New York Yankees, couleur vert foncé avec logo NY noir brodé. Coupe ajustée, visière incurvée."},
-      {id:9, name:"Lavande NY", price:199, img:"assets/images/Lavande.png", desc:"Casquette 47 New York Yankees, couleur lavande avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:10, name:"Noir NY (Logo Rouge)", price:199, img:"assets/images/Noir Logo Rouge.png", desc:"Casquette 47 New York Yankees, couleur noir avec logo NY rouge brodé. Coupe ajustée, visière incurvée."},
-      {id:11, name:"Bleu Roi NY", price:199, img:"assets/images/Bleu Roi.png", desc:"Casquette 47 New York Yankees, couleur bleu roi avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:12, name:"Vert Foncé NY Script", price:199, img:"assets/images/Vert Foncé.png", desc:"Casquette 47 New York Yankees, couleur vert foncé avec écriture \"Yankees\" dorée brodée. Coupe ajustée, visière incurvée."},
-      {id:13, name:"Crème LA", price:199, img:"assets/images/CrémeLA.png", desc:"Casquette New Era LA (Los Angeles), couleur crème et vert foncé avec logo LA bleu et broderie rose. Coupe ajustée, visière incurvée."},
-      {id:14, name:"Rouge NY", price:199, img:"assets/images/Rouge.png", desc:"Casquette 47 New York Yankees, couleur rouge avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:15, name:"Vert Foncé NY (Logo Blanc)", price:199, img:"assets/images/Vert Logo blanc.png", desc:"Casquette 47 New York Yankees, couleur vert foncé avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:16, name:"Noir NY (Logo Blanc)", price:199, img:"assets/images/Noir logo Blanc.png", desc:"Casquette 47 New York Yankees, couleur noir avec logo NY blanc brodé. Coupe ajustée, visière incurvée."},
-      {id:17, name:"Jaune Stone Island", price:199, img:"assets/images/Jaune Stone Island.png", desc:"Casquette 47 Stone Island, couleur jaune avec écusson compass brodé noir. Coupe ajustée, visière incurvée."},
+      { id: 0, name: "Orange NY", price: 199, img: "assets/images/Orange.png", desc: "Casquette 47 New York Yankees, couleur orange avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 1, name: "Bordeaux LA", price: 199, img: "assets/images/Bordeaux LA.png", desc: "Casquette 47 LA (Los Angeles), couleur bordeaux avec logo LA blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 2, name: "Camel NY", price: 199, img: "assets/images/Camel.png", desc: "Casquette 47 New York Yankees, couleur camel avec logo NY ton sur ton. Coupe ajustée, visière incurvée." },
+      { id: 3, name: "Vert Pétant NY", price: 199, img: "assets/images/Vert Petant.png", desc: "Casquette 47 New York Yankees, couleur vert pétant avec logo NY noir brodé. Coupe ajustée, visière incurvée." },
+      { id: 4, name: "Rose NY", price: 199, img: "assets/images/Rose.png", desc: "Casquette 47 New York Yankees, couleur rose avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 5, name: "Violet NY", price: 199, img: "assets/images/Violet.png", desc: "Casquette 47 New York Yankees, couleur violet avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 6, name: "Bleu Marine NY", price: 199, img: "assets/images/Bleu marine.png", desc: "Casquette 47 New York Yankees, couleur bleu marine avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 7, name: "Bleu Ciel NY", price: 199, img: "assets/images/Bleu ciel.png", desc: "Casquette 47 New York Yankees, couleur bleu ciel avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 8, name: "Vert Foncé NY (Logo Noir)", price: 199, img: "assets/images/Vert Foncé NY.png", desc: "Casquette 47 New York Yankees, couleur vert foncé avec logo NY noir brodé. Coupe ajustée, visière incurvée." },
+      { id: 9, name: "Lavande NY", price: 199, img: "assets/images/Lavande.png", desc: "Casquette 47 New York Yankees, couleur lavande avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 10, name: "Noir NY (Logo Rouge)", price: 199, img: "assets/images/Noir Logo Rouge.png", desc: "Casquette 47 New York Yankees, couleur noir avec logo NY rouge brodé. Coupe ajustée, visière incurvée." },
+      { id: 11, name: "Bleu Roi NY", price: 199, img: "assets/images/Bleu Roi.png", desc: "Casquette 47 New York Yankees, couleur bleu roi avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 12, name: "Vert Foncé NY Script", price: 199, img: "assets/images/Vert Foncé.png", desc: "Casquette 47 New York Yankees, couleur vert foncé avec écriture \"Yankees\" dorée brodée. Coupe ajustée, visière incurvée." },
+      { id: 13, name: "Crème LA", price: 199, img: "assets/images/CrémeLA.png", desc: "Casquette New Era LA (Los Angeles), couleur crème et vert foncé avec logo LA bleu et broderie rose. Coupe ajustée, visière incurvée." },
+      { id: 14, name: "Rouge NY", price: 199, img: "assets/images/Rouge.png", desc: "Casquette 47 New York Yankees, couleur rouge avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 15, name: "Vert Foncé NY (Logo Blanc)", price: 199, img: "assets/images/Vert Logo blanc.png", desc: "Casquette 47 New York Yankees, couleur vert foncé avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 16, name: "Noir NY (Logo Blanc)", price: 199, img: "assets/images/Noir logo Blanc.png", desc: "Casquette 47 New York Yankees, couleur noir avec logo NY blanc brodé. Coupe ajustée, visière incurvée." },
+      { id: 17, name: "Jaune Stone Island", price: 199, img: "assets/images/Jaune Stone Island.png", desc: "Casquette 47 Stone Island, couleur jaune avec écusson compass brodé noir. Coupe ajustée, visière incurvée." },
     ];
 
     const logEl = document.getElementById('log');
     const btn = document.getElementById('startBtn');
 
-    function log(msg, type='info') {
+    function log(msg, type = 'info') {
       logEl.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
       logEl.scrollTop = logEl.scrollHeight;
     }
@@ -75,9 +143,9 @@
       const formData = new FormData();
       formData.append('file', fileBlob, filename);
       formData.append('upload_preset', preset);
-      
+
       const res = await fetch(url, { method: 'POST', body: formData });
-      if(!res.ok) throw new Error("Cloudinary upload failed");
+      if (!res.ok) throw new Error("Cloudinary upload failed");
       const data = await res.json();
       return data.secure_url;
     }
@@ -87,19 +155,19 @@
       let cName = document.getElementById('cloudName').value.trim();
       let cPreset = document.getElementById('uploadPreset').value.trim();
 
-      if(!fbStr || !cName || !cPreset) return alert("Remplis tous les champs.");
+      if (!fbStr || !cName || !cPreset) return alert("Remplis tous les champs.");
 
       let config;
       try {
         config = (new Function("return " + fbStr))();
-        if(!config.projectId) throw new Error();
-      } catch(e) {
+        if (!config.projectId) throw new Error();
+      } catch (e) {
         return alert("Configuration Firebase invalide.");
       }
 
       btn.disabled = true;
       log("Initialisation Firestore...", "info");
-      
+
       try {
         if (!firebase.apps.length) firebase.initializeApp(config);
         const db = firebase.firestore();
@@ -111,13 +179,13 @@
           promo_3_free: true
         });
 
-        for(let p of products) {
+        for (let p of products) {
           log(`Traitement de ${p.name}...`, "info");
           try {
             const response = await fetch(p.img);
-            if(!response.ok) throw new Error("Image locale introuvable");
+            if (!response.ok) throw new Error("Image locale introuvable");
             const blob = await response.blob();
-            
+
             // Cloudinary Upload
             const filename = p.img.split('/').pop();
             const cloudinaryUrl = await uploadToCloudinary(blob, filename, cName, cPreset);
@@ -150,4 +218,5 @@
     });
   </script>
 </body>
+
 </html>
