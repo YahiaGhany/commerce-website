@@ -59,9 +59,34 @@ const grid = document.getElementById('wallGrid');
 
 function renderProducts() {
   grid.innerHTML = '';
-  products.forEach((p) => {
+
+  let filtered = [...products];
+  const searchInput = document.getElementById('searchInput');
+  const inStockFilter = document.getElementById('inStockFilter');
+  const sortSelect = document.getElementById('sortSelect');
+  
+  if (searchInput && searchInput.value) {
+    const s = searchInput.value.toLowerCase();
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(s));
+  }
+  
+  if (inStockFilter && inStockFilter.checked) {
+    filtered = filtered.filter(p => !p.sold_out);
+  }
+  
+  if (sortSelect) {
+    if (sortSelect.value === 'price-asc') {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortSelect.value === 'price-desc') {
+      filtered.sort((a, b) => b.price - a.price);
+    }
+    // newest is default, already sorted from firebase
+  }
+
+  filtered.forEach((p, index) => {
     const slot = document.createElement('div');
-    slot.className = 'slot';
+    slot.className = 'slot reveal'; // Ajout class reveal
+    slot.style.transitionDelay = `${(index % 3) * 0.15}s`; // Stagger effect
     slot.tabIndex = 0; // Accessibilité : navigation au clavier
 
     const openProd = () => openProduct(p.id);
@@ -80,8 +105,22 @@ function renderProducts() {
         <div class="slot-footer"><span class="price-tag">${p.price} DH</span></div>
       `;
     grid.appendChild(slot);
+    
+    // Si io (IntersectionObserver) est déjà instancié
+    if (typeof io !== 'undefined') {
+      // Petite astuce : on attend la frame suivante pour observer
+      // afin que le navigateur enregistre l'état initial (opacity: 0)
+      requestAnimationFrame(() => {
+        io.observe(slot);
+      });
+    }
   });
 }
+
+// Event listeners for filters
+document.getElementById('searchInput')?.addEventListener('input', renderProducts);
+document.getElementById('inStockFilter')?.addEventListener('change', renderProducts);
+document.getElementById('sortSelect')?.addEventListener('change', renderProducts);
 
 // ---- View routing (store vs product) ----
 const storeView = document.getElementById('storeView');
@@ -89,10 +128,90 @@ const productView = document.getElementById('productView');
 let currentProduct = null;
 let currentQty = 1;
 
+const secondaryImagesMap = [
+  { match: ["bleu roi"], file: "Bleu roi.jpeg" },
+  { match: ["bleu uni"], file: "Bleu uni (2).jpeg" },
+  { match: ["bleu ciel"], file: "Bleu ciel.jpeg" },
+  { match: ["marine"], file: "Bleu Marine.jpeg" },
+  { match: ["bordeaux"], file: "Bordeaux LA.jpeg" },
+  { match: ["camel"], file: "Camel NY.jpeg" },
+  { match: ["creme", "bleu"], file: "Creme Bleu.jpeg" },
+  { match: ["lavande"], file: "Lavande.jpeg" },
+  { match: ["noir", "rouge"], file: "Noir logo rouge.jpeg" },
+  { match: ["noir", "jaune"], file: "Noir logo jaune.jpeg" },
+  { match: ["noir", "blanc"], file: "Noir logo blanc.jpeg" },
+  { match: ["orange"], file: "Orange NY.jpeg" },
+  { match: ["rose"], file: "Rose NY.jpeg" },
+  { match: ["rouge ny"], file: "Rouge.jpeg" }, // avoids matching noir rouge
+  { match: ["vert", "script"], file: "Vert foncé.jpeg" },
+  { match: ["vert", "blanc"], file: "Vert logo blanc.jpeg" },
+  { match: ["yankee"], file: "Vert Yankees.jpeg" },
+  { match: ["petant"], file: "Vert petant.jpeg" }
+];
+
 function openProduct(id) {
   currentProduct = products.find(p => p.id === id);
   currentQty = 1;
-  document.getElementById('pVisual').innerHTML = dotHTML(currentProduct);
+  
+  // Normalize string to remove accents
+  const pName = currentProduct.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  let secondaryFilename = null;
+  
+  for (const item of secondaryImagesMap) {
+    // Check if ALL keywords match
+    if (item.match.every(keyword => pName.includes(keyword))) {
+      secondaryFilename = item.file;
+      break;
+    }
+  }
+  
+  if (secondaryFilename) {
+    const mainImgUrl = optimizeImg(currentProduct.img);
+    const secondaryImgUrl = optimizeImg(`assets/images_secondaires/${secondaryFilename}`);
+    
+    document.getElementById('pVisual').innerHTML = `
+      <div class="product-slider" id="productSlider">
+        <div class="product-slide"><img class="img-main" src="${mainImgUrl}" alt="${currentProduct.name}"></div>
+        <div class="product-slide"><img class="img-secondary" src="${secondaryImgUrl}" alt="${currentProduct.name} Vue 2"></div>
+      </div>
+      <button class="slider-arrow prev" id="sliderPrev">←</button>
+      <button class="slider-arrow next" id="sliderNext">→</button>
+      <div class="slider-dots">
+        <div class="dot active" data-slide="0"></div>
+        <div class="dot" data-slide="1"></div>
+      </div>
+    `;
+    
+    const slider = document.getElementById('productSlider');
+    const dots = document.querySelectorAll('.slider-dots .dot');
+    const prevBtn = document.getElementById('sliderPrev');
+    const nextBtn = document.getElementById('sliderNext');
+    
+    slider.addEventListener('scroll', () => {
+      const slideWidth = slider.clientWidth;
+      const activeIndex = Math.round(slider.scrollLeft / slideWidth);
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === activeIndex);
+      });
+    });
+    
+    dots.forEach(dot => {
+      dot.addEventListener('click', (e) => {
+        const index = parseInt(e.target.getAttribute('data-slide'));
+        slider.scrollTo({ left: index * slider.clientWidth, behavior: 'smooth' });
+      });
+    });
+
+    prevBtn.addEventListener('click', () => {
+      slider.scrollBy({ left: -slider.clientWidth, behavior: 'smooth' });
+    });
+
+    nextBtn.addEventListener('click', () => {
+      slider.scrollBy({ left: slider.clientWidth, behavior: 'smooth' });
+    });
+  } else {
+    document.getElementById('pVisual').innerHTML = dotHTML(currentProduct);
+  }
   document.getElementById('pName').textContent = currentProduct.name;
   document.getElementById('pPrice').textContent = currentProduct.price + ' DH';
   document.getElementById('pDesc').textContent = currentProduct.desc;
@@ -171,10 +290,33 @@ function updateCartCount() {
   document.getElementById('cartCount').textContent = cartTotalQty();
 }
 
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div class="toast-icon">✓</div><div>${message}</div>`;
+  container.appendChild(toast);
+  
+  // Trigger reflow to animate
+  toast.offsetHeight;
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 function addToCart(id, qty) {
   cart[id] = (cart[id] || 0) + qty;
   updateCartCount();
   renderDrawer();
+  
+  const p = products.find(pp => pp.id == id);
+  if (p) {
+    showToast(`${qty}x ${p.name} ajouté(e) au panier !`);
+  }
 }
 
 function dotHTMLsmall(p) {
@@ -271,7 +413,6 @@ overlayBg.addEventListener('click', () => { closeDrawer(); closeModal(); });
 // ---- Product page actions ----
 document.getElementById('addCartBtn').addEventListener('click', () => {
   addToCart(currentProduct.id, currentQty);
-  openDrawer();
 });
 document.getElementById('goCheckoutBtn').addEventListener('click', openCheckout);
 
@@ -359,7 +500,10 @@ async function loadData() {
       const pData = promoDoc.data();
       promoRules = pData;
       if (pData.text_bandeau) {
-        document.querySelector('.promo-track').innerHTML = pData.text_bandeau + " &middot; " + pData.text_bandeau;
+        let rawText = pData.text_bandeau.replace(/<\/?span>/g, '');
+        let parts = rawText.split(/&middot;|·/).map(p => p.trim()).filter(p => p);
+        let formatted = parts.map(p => `<span>${p}</span>`).join(' &middot; ');
+        document.querySelector('.promo-track').innerHTML = formatted + " &middot; " + formatted;
       }
     }
 
