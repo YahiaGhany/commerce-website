@@ -170,7 +170,7 @@ function openProduct(id) {
   
   if (secondaryFilename) {
     const mainImgUrl = optimizeImg(currentProduct.img);
-    const secondaryImgUrl = optimizeImg(`assets/images_secondaires/${secondaryFilename}`);
+    const secondaryImgUrl = optimizeImg(`assets/images_secondaires/${secondaryFilename}?v=2`);
     
     document.getElementById('pVisual').innerHTML = `
       <div class="product-slider" id="productSlider">
