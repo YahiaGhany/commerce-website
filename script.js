@@ -143,7 +143,7 @@ const secondaryImagesMap = [
   { match: ["orange"], file: "Orange NY.jpeg" },
   { match: ["rose"], file: "Rose NY.jpeg" },
   { match: ["rouge ny"], file: "Rouge.jpeg" }, // avoids matching noir rouge
-  { match: ["vert", "script"], file: "Vert foncé.jpeg" },
+  { match: ["vert", "fonce"], file: "Vert foncé.jpeg" },
   { match: ["vert", "blanc"], file: "Vert logo blanc.jpeg" },
   { match: ["yankee"], file: "Vert Yankees.jpeg" },
   { match: ["petant"], file: "Vert petant.jpeg" }
