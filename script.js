@@ -149,7 +149,10 @@ const secondaryImagesMap = [
   { match: ["petant"], file: "Vert petant.jpeg" }
 ];
 
+let savedScrollPosition = 0;
+
 function openProduct(id) {
+  savedScrollPosition = window.scrollY;
   currentProduct = products.find(p => p.id === id);
   currentQty = 1;
   
@@ -219,7 +222,7 @@ function openProduct(id) {
 
   // Dynamic promo note
   let promoNotes = [];
-  if (promoRules.promo_2) promoNotes.push(`2 achetées = -${promoRules.promo_2} DH`);
+  if (promoRules.promo_2) promoNotes.push(`2 achetées = -${Math.abs(promoRules.promo_2)} DH`);
   if (promoRules.promo_3_free) promoNotes.push(`3 achetées = 4ème offerte`);
   document.getElementById('pPromoNote').textContent = promoNotes.length ? `🎁 Promo : ${promoNotes.join(' | ')}` : '';
 
@@ -243,6 +246,7 @@ function openProduct(id) {
 function backToStore() {
   productView.style.display = 'none';
   storeView.style.display = 'block';
+  window.scrollTo({ top: savedScrollPosition, behavior: 'instant' in document.documentElement.style ? 'instant' : 'auto' });
 }
 document.getElementById('backToStore').addEventListener('click', backToStore);
 
@@ -376,18 +380,16 @@ function renderDrawer() {
   } else {
     hintBar.style.display = 'block';
     const remainder = totalQty % 4;
+    const discountVal = Math.abs(promoRules.promo_2);
+    
     if (promoRules.promo_3_free && remainder === 0 && totalQty > 0) {
       hintBar.textContent = "Félicitations, 1 casquette OFFERTE ! 🎁";
     } else if (promoRules.promo_3_free && remainder === 3) {
-      hintBar.textContent = "Plus qu'1 casquette pour avoir la 4ème GRATUITE ! 🔥";
+      hintBar.textContent = "Ajoutez 1 casquette supplémentaire, elle sera GRATUITE ! 🔥";
     } else if (promoRules.promo_2 && remainder === 2) {
-      if (promoRules.promo_3_free) {
-        hintBar.textContent = `Réduction appliquée ! Ajoute 1 casquette pour la 4ème offerte ! 🎁`;
-      } else {
-        hintBar.textContent = `Félicitations, réduction de -${promoRules.promo_2} DH appliquée ! 🎉`;
-      }
+      hintBar.textContent = `Réduction de -${discountVal} DH appliquée ! 🎉 Ajoutez 2 casquettes pour la 4ème offerte !`;
     } else if (promoRules.promo_2 && remainder === 1) {
-      hintBar.textContent = `Encore 1 casquette pour débloquer -${promoRules.promo_2} DH !`;
+      hintBar.textContent = `Ajoutez 1 casquette pour débloquer -${discountVal} DH de réduction !`;
     } else {
       hintBar.style.display = 'none';
     }

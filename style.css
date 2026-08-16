@@ -201,9 +201,9 @@ nav.links a:hover::after {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: url('assets/images/casablanca-2807439_960_720.jpg') center/cover no-repeat;
+  background: url('assets/images/hero_bg_2.jpg') center/cover no-repeat;
   filter: grayscale(100%);
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
 .hero-grid {
